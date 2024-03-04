@@ -22,7 +22,7 @@ app.use("/api/course", course);
 
 app.use(express.static("Images"));
 
-app.listen(5000, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log("Server is running...");
 });
 
