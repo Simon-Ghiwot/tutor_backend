@@ -29,7 +29,7 @@ router.route("/").get(getAllStudent);
 router.post("/", upload.single("picture"), createStudent);
 router.put("/:id", upload.single("picture"), updateStudent);
 router.delete("/:id", deleteStudent);
-router.route("/login").get(getStudentById);
+router.post("/login", getStudentById);
 router.route("/recovery").get(getPasswordQuestionAndAnswer).put(updatePassword);
 
 module.exports = router;
