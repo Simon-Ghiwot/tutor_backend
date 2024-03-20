@@ -19,8 +19,6 @@ const getAllStudent = async (req, res) => {
 const getStudentById = async (req, res) => {
   const { email, password } = req.body;
 
-  console.log('email', email, 'password', password);
-
   const query = `SELECT id, first_name, last_name, university, profile_picture, phone_number, academic_year, email, password FROM Student WHERE email = '${email}'`;
   try {
     db.query(query, (error, result) => {
