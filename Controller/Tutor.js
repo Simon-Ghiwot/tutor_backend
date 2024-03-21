@@ -19,7 +19,7 @@ const getAllTutor = async (req, res) => {
 const getTutorById = async (req, res) => {
   const { email, password } = req.body;
 
-  const query = `SELECT id, first_name, last_name, university, course, price, status, teaching_method, hours, profile_picture, rating, email, phone_number, password, has_premium FROM Tutor WHERE id = '${email}'`;
+  const query = `SELECT id, first_name, last_name, university, course, price, status, teaching_method, hours, profile_picture, rating, email, phone_number, password, has_premium FROM Tutor WHERE email = '${email}'`;
 
   try {
     db.query(query, (error, result) => {
@@ -107,6 +107,7 @@ const createTutor = async (req, res) => {
       }
     );
   } catch (error) {
+    console.log(error)
     res.status(404).json({ success: false, message: "Task failed try again" });
   }
 };
