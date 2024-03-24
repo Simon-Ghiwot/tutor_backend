@@ -1,6 +1,7 @@
 const connection = require("./database");
 const mysql = require("mysql");
 const bcrypt = require("bcrypt");
+const gptCompletion = require("../GPT/complation");
 
 const db = mysql.createPool(connection);
 
@@ -8,15 +9,16 @@ const getAllTutor = async (req, res) => {
   const query =
     "SELECT id, first_name, last_name, university, course, price, status, teaching_method, hours, profile_picture, rating, email, phone_number, has_premium FROM Tutor";
   try {
-    db.query(query, (err, result) => {
-      res.status(200).json({ success: true, data: result });
+    db.query(query, async (err, result) => {
+      const completion = await gptCompletion(result);
+      res.status(200).json({ success: true, data: JSON.parse(completion) });
     });
   } catch (error) {
-    res.status(404).json({ success: false, message: "Task failed try again" });
+    res.status(400).json({ success: false, message: "Task failed try again" });
   }
 };
 
-const getTutorById = async (req, res) => {
+const loginTutor = async (req, res) => {
   const { email, password } = req.body;
 
   const query = `SELECT id, first_name, last_name, university, course, price, status, teaching_method, hours, profile_picture, rating, email, phone_number, password, has_premium FROM Tutor WHERE email = '${email}'`;
@@ -36,6 +38,22 @@ const getTutorById = async (req, res) => {
       res
         .status(404)
         .json({ success: false, message: "password doesnot match" });
+    });
+  } catch (error) {
+    res.status(404).json({ success: false, message: "Task failed try again" });
+  }
+};
+const getTutorById = async (req, res) => {
+  const { id } = req.params;
+  const query = `SELECT id, first_name, last_name, university, course, price, status, teaching_method, hours, profile_picture, rating, rating_count, email, phone_number, has_premium FROM Tutor WHERE id = ${id}`;
+  try {
+    db.query(query, (error, result) => {
+      if (result.length === 0)
+        return res
+          .status(404)
+          .json({ success: false, message: "Tutor not found" });
+
+      res.status(200).json({ success: true, data: result });
     });
   } catch (error) {
     res.status(404).json({ success: false, message: "Task failed try again" });
@@ -79,7 +97,24 @@ const createTutor = async (req, res) => {
   } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const profile_picture = `http://localhost:5000/${req.file.filename}`;
+    const profile_picture = `http://localhost:5012/${req.file.filename}`;
+
+    console.log({
+      first_name,
+      last_name,
+      university,
+      course,
+      price,
+      status,
+      teaching_method,
+      rating,
+      email,
+      hashedPassword,
+      phone_number,
+      password_question,
+      password_answer,
+      profile_picture,
+    });
     const query =
       "INSERT INTO Tutor (first_name, last_name, university, course, price, status, teaching_method, rating, email, password, phone_number, password_question, password_answer, profile_picture) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     db.query(
@@ -101,13 +136,19 @@ const createTutor = async (req, res) => {
         profile_picture,
       ],
       (error, result) => {
+        if (error) {
+          console.log(error);
+          return res
+            .status(404)
+            .json({ success: false, message: "Something went wrong!" });
+        }
         res
           .status(200)
           .json({ success: true, message: "Tutor successfully added" });
       }
     );
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(404).json({ success: false, message: "Task failed try again" });
   }
 };
@@ -169,15 +210,39 @@ const deleteTutor = async (req, res) => {
   }
 };
 const getTutorQualification = async (req, res) => {
-  const { tutor_id } = req.params;
+  const { id } = req.params;
 
   try {
     const query = "SELECT * FROM Tutor_qualification WHERE tutor_id = ?";
-    db.query(query, [tutor_id], (error, result) => {
+    db.query(query, [id], (error, result) => {
       if (error) {
         res.status(500).json({ success: false, message: "Database error" });
       } else {
         res.status(200).json({ success: true, data: result });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Database error" });
+  }
+};
+
+const uploadTutorQualification = async (req, res) => {
+  const { id } = req.params;
+  const course_name = "Biology"; // This should be sent in the request body
+  const certificate = `http://localhost:5012/${req.file.filename}`;
+
+  try {
+    const query =
+      "INSERT INTO Tutor_qualification (tutor_id, certificate, course_name) VALUES (?, ?, ?)";
+    db.query(query, [id, certificate, course_name], (error, result) => {
+      if (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: "Database error" });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: "Qualification added successfully",
+        });
       }
     });
   } catch (error) {
@@ -276,10 +341,12 @@ const subscribeToPremium = async (req, res) => {
 module.exports = {
   getAllTutor,
   getTutorById,
+  loginTutor,
   createTutor,
   updateTutor,
   deleteTutor,
   getTutorQualification,
+  uploadTutorQualification,
   getPasswordQuestionAndAnswer,
   updatePassword,
   subscribeToPremium,
