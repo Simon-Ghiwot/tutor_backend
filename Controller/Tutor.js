@@ -14,7 +14,7 @@ const getAllTutor = async (req, res) => {
       res.status(200).json({ success: true, data: JSON.parse(completion) });
     });
   } catch (error) {
-    res.status(404).json({ success: false, message: "Task failed try again" });
+    res.status(400).json({ success: false, message: "Task failed try again" });
   }
 };
 
