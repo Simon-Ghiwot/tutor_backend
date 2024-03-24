@@ -1,6 +1,6 @@
 const connection = require("./database");
 const mysql = require("mysql");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const db = mysql.createPool(connection);
 
