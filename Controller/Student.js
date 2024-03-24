@@ -56,7 +56,7 @@ const createStudent = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const profile_picture = `http://localhost:5000/${req.file.filename}`;
+    const profile_picture = `http://localhost:5012/${req.file.filename}`;
     const query =
       "INSERT INTO Student (first_name, last_name, university, phone_number, academic_year, email, password, profile_picture, password_question, password_answer) VALUES (?,?,?,?,?,?,?,?,?,?)";
     await db.query(
@@ -74,9 +74,6 @@ const createStudent = async (req, res) => {
         password_answer,
       ],
       (error, result) => {
-        console.log("Error", error);
-        console.log(profile_picture);
-
         res
           .status(200)
           .json({ success: true, message: "Student successfully added" });
@@ -139,8 +136,7 @@ const deleteStudent = async (req, res) => {
 };
 
 const getPasswordQuestionAndAnswer = async (req, res) => {
-  const { email } = req.params;
-
+  const { email } = req.body;
   try {
     const query =
       "SELECT password_question, password_answer FROM Student WHERE email = ?";
@@ -148,7 +144,7 @@ const getPasswordQuestionAndAnswer = async (req, res) => {
       if (error) {
         res.status(500).json({ success: false, message: "Database error" });
       } else if (result.length === 0) {
-        res.status(404).json({ success: false, message: "Tutor not found" });
+        res.status(404).json({ success: false, message: "Student not found" });
       } else {
         const { password_question, password_answer } = result[0];
         res
@@ -165,6 +161,7 @@ const updatePassword = async (req, res) => {
   const { email } = req.params;
   const { password } = req.body;
 
+  console.log(email, password)
   try {
     // Hash the new password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -175,7 +172,7 @@ const updatePassword = async (req, res) => {
       if (error) {
         res.status(500).json({ success: false, message: "Database error" });
       } else if (result.affectedRows === 0) {
-        res.status(404).json({ success: false, message: "Tutor not found" });
+        res.status(404).json({ success: false, message: "Student not found" });
       } else {
         res
           .status(200)
