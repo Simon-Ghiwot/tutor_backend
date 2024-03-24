@@ -6,17 +6,15 @@ const db = mysql.createPool(connection);
 const calculateRating = async (req, res) => {
   const { tutor_id, student_id } = req.params;
   const { score, hours, comment } = req.body;
-  const course_name = 'Biology';
 
   try {
     const insertQuery =
-      "INSERT INTO Rating (tutor_id, student_id, score, hours, comment, course_name) VALUES (?, ?, ?, ?, ?, ?)";
+      "INSERT INTO Ratings (tutor_id, student_id, score, hours, comment) VALUES (?, ?, ?, ?, ?)";
     db.query(
       insertQuery,
-      [tutor_id, student_id, score, hours, comment, course_name],
+      [tutor_id, student_id, score, hours, comment],
       (insertError) => {
         if (insertError) {
-          console.log(insertError);
           res.status(500).json({ success: false, message: "Database error" });
         } else {
           // Fetch tutor data and calculate new total rating
@@ -62,21 +60,4 @@ const calculateRating = async (req, res) => {
   }
 };
 
-const getRating = async (req, res) => {
-  const { tutor_id } = req.params;
-
-  try {
-    const fetchQuery = "SELECT * FROM Rating WHERE tutor_id = ?";
-    db.query(fetchQuery, [tutor_id], (fetchError, fetchResult) => {
-      if (fetchError) {
-        res.status(500).json({ success: false, message: "Database error" });
-      } else {
-        res.status(200).json({ success: true, data: fetchResult });
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Task failed, try again" });
-  }
-}
-
-module.exports = { calculateRating, getRating };
+module.exports = { calculateRating };

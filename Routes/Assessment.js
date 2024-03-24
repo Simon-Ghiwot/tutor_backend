@@ -7,8 +7,8 @@ const {
 
 const router = express.Router();
 
-router.route("/:name").get(getAssessmentTest);
-router.route("/:tutor_id").put(updateAssessmentResult);
+router.route("/").get(getAssessmentTest);
+router.route("/:id").put(updateAssessmentResult);
 router.route("/:id").get(getAssessmentResultById);
 
 module.exports = router;

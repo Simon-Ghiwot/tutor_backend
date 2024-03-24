@@ -4,14 +4,9 @@ const mysql = require("mysql");
 const db = mysql.createPool(connection);
 
 const getAssessmentTest = async (req, res) => {
-  const { name } = req.params;
-  if (!name) {
-    res.status(400).json({ success: false, message: "Course name is required!" });
-  }
-
-  const course_name = name.replace(/ /g, "_").toLowerCase();
+  const { name } = req.body;
   try {
-    const test = require(`../Assessments/${course_name}`);
+    const test = require(`../Assessments/${name}`);
     res.status(200).json(test);
   } catch (error) {
     res.status(500).json({ success: false, message: "Database error" });
@@ -19,13 +14,8 @@ const getAssessmentTest = async (req, res) => {
 };
 
 const updateAssessmentResult = async (req, res) => {
-  let { course_name, grade } = req.body;
+  const { course_name, grade } = req.body;
   const { tutor_id } = req.params;
-  if (!course_name || !grade) {
-    res.status(400).json({ success: false, message: "Course name and grade are required!" });
-  }
-  course_name = decodeURIComponent(course_name);
-
   try {
     let query =
       "INSERT INTO Tutor_assessment (tutor_id, course_name, grade) values (?,?,?)";

@@ -30,7 +30,6 @@ router.post("/", upload.single("picture"), createStudent);
 router.put("/:id", upload.single("picture"), updateStudent);
 router.delete("/:id", deleteStudent);
 router.post("/login", getStudentById);
-router.post("/recovery", getPasswordQuestionAndAnswer);
-router.put("/recovery/:email", updatePassword);
+router.route("/recovery").get(getPasswordQuestionAndAnswer).put(updatePassword);
 
 module.exports = router;

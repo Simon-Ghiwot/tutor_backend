@@ -37,7 +37,7 @@ app.use("/api/payment/init", async (req, res) => {
       phone_number,
       tx_ref: reference,
       callback_url: "https://webhook.site/077164d6-29cb-40df-ba29-8a00e59a7e60",
-      return_url: "http://localhost:3000/login",
+      return_url: "https://www.google.com/",
     };
 
     const response = await axios.post(CHAPA_URL, payload, {

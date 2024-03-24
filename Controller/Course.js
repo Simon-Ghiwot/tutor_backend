@@ -18,23 +18,4 @@ const getAllCourse = async (req, res) => {
   }
 };
 
-const createCourse = async (req, res) => {
-  const { name } = req.body;
-
-  try {
-    const query = `INSERT INTO Course (name) VALUES ('${name}')`;
-    db.query(query, (error
-    ) => {
-      if (error) {
-        res.status(500).json({ success: false, message: "Database error" });
-      } else {
-        res.status(200).json({ success: true, message: "Course created" });
-      }
-    }
-    );
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Something went wrong!" });
-  }
-}
-
-module.exports = { getAllCourse, createCourse };
+module.exports = { getAllCourse };

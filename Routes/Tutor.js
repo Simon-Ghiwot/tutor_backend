@@ -5,7 +5,6 @@ const path = require("path");
 const {
   getAllTutor,
   getTutorById,
-  loginTutor,
   createTutor,
   updateTutor,
   deleteTutor,
@@ -14,9 +13,7 @@ const {
   updatePassword,
   subscribeToPremium,
   getTutorsByName,
-  uploadTutorQualification,
 } = require("../Controller/Tutor");
-const { route } = require("./Student");
 
 const router = express.Router();
 
@@ -35,12 +32,9 @@ router.route("/").get(getAllTutor);
 router.post("/", upload.single("picture"), createTutor);
 router.put("/:id", upload.single("picture"), updateTutor);
 router.route("/:id").delete(deleteTutor);
-router.route("/qualification/:id").get(getTutorQualification);
-router.post("/qualification/:id", upload.single("picture"), uploadTutorQualification);
-router.route("/login").post(loginTutor);
-router.route("/:id").get(getTutorById);
-router.post("/recovery", getPasswordQuestionAndAnswer);
-router.put("/recovery/:id", updatePassword);
+router.route("/qualification").get(getTutorQualification);
+router.route("/login").get(getTutorById);
+router.route("/recovery").get(getPasswordQuestionAndAnswer).put(updatePassword);
 router.route("/premium").post(subscribeToPremium);
 router.route("/search").get(getTutorsByName);
 
