@@ -1,7 +1,7 @@
 const OpenAI = require("openai");
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: process.env.OPENAI_KEY,
 });
 
 const tutorModel = {
